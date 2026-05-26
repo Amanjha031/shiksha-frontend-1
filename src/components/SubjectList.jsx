@@ -1,5 +1,4 @@
 import { useMemo, useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 
 import '../css/SubjectList.css';
@@ -28,11 +27,14 @@ const Breadcrumb = ({ items, onNavigate }) => {
   );
 };
 
-const SubjectList = ({ course, courseId, enrollmentStatus, boardGroup, board, selectedClass, onBack }) => {
-  const navigate = useNavigate();
+const SubjectList = ({ course, courseId, enrollmentStatus, boardGroup, board, selectedClass, onBack, onEnroll }) => {
   const [expandedIndex, setExpandedIndex] = useState(0);
   const purchaseCardRef = useRef(null);
   const [purchaseCardVisible, setPurchaseCardVisible] = useState(false);
+  const [showMobileHero, setShowMobileHero] = useState(false);
+  const [showLearnMore, setShowLearnMore] = useState(false);
+
+
 
   useEffect(() => {
     const el = purchaseCardRef.current;
@@ -116,8 +118,17 @@ const SubjectList = ({ course, courseId, enrollmentStatus, boardGroup, board, se
 
             <p className="course-detail-hero__summary">
               {summaryText}
-              <br />
-              Live Digital Classes | Structured learning | Chapter-wise coverage | Board-focused preparation
+            </p>
+
+            {/* MOBILE HIDDEN CONTENT */}
+          <div
+            className={`course-mobile-hidden ${
+            showMobileHero ? 'show-mobile-content' : ''
+            }`}
+          >
+            <p className="course-detail-hero__summary">
+              Live Digital Classes | Structured learning | Chapter-wise coverage |
+              Board-focused preparation
             </p>
 
             <p className="course-detail-hero__meta">
@@ -128,6 +139,16 @@ const SubjectList = ({ course, courseId, enrollmentStatus, boardGroup, board, se
               Board: {boardName} / Curriculum aligned
             </p>
           </div>
+
+          {/* MOBILE BUTTON */}
+          <button
+            type="button"
+            className="course-mobile-toggle-btn"
+            onClick={() => setShowMobileHero((prev) => !prev)}
+          >
+          {showMobileHero ? 'Show Less' : 'See More'}
+          </button>
+        </div>
         </div>
       </section>
 
@@ -137,28 +158,49 @@ const SubjectList = ({ course, courseId, enrollmentStatus, boardGroup, board, se
             <div className="course-detail-panel">
               <section className="course-learn-box">
                 <h2 className="course-section-heading">What you'll learn</h2>
-
-                <div className="course-learn-grid">
-                  {learnItems.map((item, index) => (
-                    <div key={index} className="course-learn-item">
-                      ✓ {item}
+                
+                <div className="course-learn-grid"> 
+                  {(
+                    window.innerWidth <= 700
+                    ? (showLearnMore ? learnItems : learnItems.slice(0, 3))
+                    : learnItems
+                  ).map((item, index) => (
+                  <div key={index} className="course-learn-item">
+                    ✓ {item}
                     </div>
                   ))}
-                </div>
-              </section>
+                  </div>
+                  </section>
+                  
+                  
+                  {(
+  window.innerWidth > 700 || showLearnMore
+) && (
+  <section className="course-includes">
+    <h3 className="course-sub-heading">This course includes:</h3>
 
-              <section className="course-includes">
-                <h3 className="course-sub-heading">This course includes:</h3>
+    <div className="course-includes-grid">
+      {includeItems.map((item, index) => (
+        <div key={index} className="course-includes-item">
+          {item}
+        </div>
+      ))}
+    </div>
+  </section>
+)}
 
-                <div className="course-includes-grid">
-                  {includeItems.map((item, index) => (
-                    <div key={index} className="course-includes-item">
-                      {item}
-                    </div>
-                  ))}
-                </div>
-              </section>
-            </div>
+                  <button
+                  type="button"
+                  className="course-mobile-section-btn"
+                  onClick={() => setShowLearnMore((prev) => !prev)}
+                  >
+                    {showLearnMore ? 'Show Less' : 'See More'}
+                    </button>
+
+</div>
+
+
+            
 
             <div className="course-detail-panel course-detail-panel--content">
               <section className="course-content-section">
@@ -232,7 +274,7 @@ const SubjectList = ({ course, courseId, enrollmentStatus, boardGroup, board, se
             </ul>
 <button
   className="purchase-card__btn"
-  onClick={() => navigate("/enroll")}
+  onClick={onEnroll}
 >
   Start Subscription
 </button>

@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useToast } from "../contexts/ToastContext";
-import { HOME_URL } from "../config/urls";
 import "./Login.css";
 
 const EyeIcon = () => (
@@ -13,7 +12,10 @@ const EyeIcon = () => (
 );
 
 const EyeOffIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+    <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
     <line x1="1" y1="1" x2="23" y2="23"/>
   </svg>
 );
@@ -30,7 +32,6 @@ const Login = () => {
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
-  const [isRedirecting, setIsRedirecting] = useState(false);
 
   // ✅ SHOW MESSAGE FROM SIGNUP
   useEffect(() => {
@@ -54,10 +55,7 @@ const Login = () => {
 
       showToast({ message: "You are logged in! Welcome back.", duration: 2500 });
 
-      setIsRedirecting(true);
-      setStatusMessage("Login successful! Redirecting...");
-
-      let redirectTo = HOME_URL;
+      let redirectTo = "/";
       try {
         const stashed = sessionStorage.getItem("post_auth_redirect");
         if (stashed && stashed.startsWith("/") && !stashed.startsWith("//")) {
@@ -66,9 +64,7 @@ const Login = () => {
         sessionStorage.removeItem("post_auth_redirect");
       } catch (_) { /* sessionStorage unavailable */ }
 
-      setTimeout(() => {
-        window.location.href = redirectTo;
-      }, 2500);
+      navigate(redirectTo, { replace: true });
 
     } catch (err) {
       const raw = err?.message ?? err;
@@ -83,18 +79,9 @@ const Login = () => {
   };
 
   return (
-    <div className={`login-container ${isRedirecting ? "is-redirecting" : ""}`}>
+    <div className="login-container">
       <div className="login-glow-center"></div>
       <div className="login-glow-top-right"></div>
-      {isRedirecting && (
-        <div className="login-overlay">
-          <div className="login-overlay-card">
-            <div className="login-spinner"></div>
-            <h3>Please wait</h3>
-            <p>{statusMessage}</p>
-          </div>
-        </div>
-      )}
 
       <div className="login-form">
         <h2>Login</h2>

@@ -33,8 +33,8 @@ import Signup from "../auth/Signup";
 import VerifyEmail from "../auth/VerifyEmail";
 import EmailVerified from "../auth/EmailVerified";
 
-import Insight from "./Insight";
-import Training from "./Training";
+import Explore from "./Explore";
+import SkillDevelopment from "./SkillDevelopment";
 import GeneralStudies from "./GeneralStudies";
 import Faq from "./Faq";
 import Counselling from "./Counselling";
@@ -54,6 +54,8 @@ import { useAuth } from "../contexts/AuthContext";
 import { APP_URL, LOGIN_URL } from "../config/urls";
 import Blogs from "./Blogs";
 import BlogDetail from "./BlogDetail";
+import ProfileFillupModal from "./ProfileFillupModal";
+import { ProfileModalProvider } from "../contexts/ProfileModalContext";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -100,8 +102,10 @@ function App() {
   if (loading) return null;
 
   return (
+    <ProfileModalProvider>
     <div className="app">
       <ScrollToTop />
+      <ProfileFillupModal />
 
       <Routes>
         <Route path="/" element={<AppEntry isAuthenticated={isAuthenticated} />} />
@@ -146,17 +150,21 @@ function App() {
         <Route
           path="/login"
           element={
-            <Page>
-              <Login />
-            </Page>
+            isAuthenticated ? <Navigate to="/" replace /> : (
+              <Page>
+                <Login />
+              </Page>
+            )
           }
         />
         <Route
           path="/signup"
           element={
-            <Page>
-              <Signup />
-            </Page>
+            isAuthenticated ? <Navigate to="/" replace /> : (
+              <Page>
+                <Signup />
+              </Page>
+            )
           }
         />
         <Route path="/verify-email" element={<VerifyEmail />} />
@@ -268,14 +276,14 @@ function App() {
             </Page>
           }
         />
-        <Route
-          path="/blogs/:id"
-          element={
-            <Page>
-              <BlogDetail />
-            </Page>
-          }
-        />
+   <Route
+  path="/blogs/*"
+  element={
+    <Page>
+      <BlogDetail />
+    </Page>
+  }
+/>
         <Route
           path="/counselling"
           element={
@@ -285,10 +293,10 @@ function App() {
           }
         />
         <Route
-          path="/insight"
+          path="/explore"
           element={
             <Page>
-              <Insight />
+              <Explore />
             </Page>
           }
         />
@@ -301,7 +309,7 @@ function App() {
           }
         />
 
-        <Route path="/training" element={<Training />} />
+        <Route path="/skill-development" element={<SkillDevelopment />} />
         <Route path="/upcoming" element={<Upcoming />} />
         <Route
           path="/payment"
@@ -346,6 +354,7 @@ function App() {
         />
       </Routes>
     </div>
+    </ProfileModalProvider>
   );
 }
 
